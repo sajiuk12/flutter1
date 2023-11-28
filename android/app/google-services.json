@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "617527301932",
+    "project_id": "mijnzpc-4911f",
+    "storage_bucket": "mijnzpc-4911f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:617527301932:android:78a4317a1ab6bfa031be89",
+        "android_client_info": {
+          "package_name": "com.app.mijnzpc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHhaRxkFjF3rNFe-S3RP04A7JBo5QaICo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
