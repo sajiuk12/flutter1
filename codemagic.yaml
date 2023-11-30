@@ -9,100 +9,101 @@
 #     set -e # exit on first failed command
 
 #     echo $IOS_FIREBASE_SECRET > $CM_BUILD_DIR/ios/Runner/GoogleService-Info.plist
-ios-workflow:
-  name: iOS Workflow
-  instance_type: mac_mini_m1
-  max_build_duration: 120
-  integrations:
-    app_store_connect: codemagic
-  environment:
-    groups:
-      - firebase_credentials
-    ios_signing:
-      distribution_type: app_store
-      bundle_identifier: com.app.mijnzpc
-    vars:
-      APP_ID: 1111111111 # <-- Put your APP ID here
-    flutter: stable
-    xcode: latest # <-- set to specific version e.g. 14.3, 15.0 to avoid unexpected updates.
-    cocoapods: default
-  scripts:
-    - name: Load Firebase configuration
-      script: |
-        #!/usr/bin/env sh
-        set -e # exit on first failed command
+workflows:
+  ios-workflow:
+    name: iOS Workflow
+    instance_type: mac_mini_m1
+    max_build_duration: 120
+    integrations:
+      app_store_connect: codemagic
+    environment:
+      groups:
+        - firebase_credentials
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.app.mijnzpc
+      vars:
+        APP_ID: 1111111111 # <-- Put your APP ID here
+      flutter: stable
+      xcode: latest # <-- set to specific version e.g. 14.3, 15.0 to avoid unexpected updates.
+      cocoapods: default
+    scripts:
+      - name: Load Firebase configuration
+        script: |
+          #!/usr/bin/env sh
+          set -e # exit on first failed command
 
-        echo $IOS_FIREBASE_SECRET > $CM_BUILD_DIR/ios/Runner/GoogleService-Info.plist
-    - name: Set up code signing settings on Xcode project
-      script: |
-        xcode-project use-profiles
-    - name: Get Flutter packages
-      script: |
-        flutter packages pub get
-    - name: Install pods
-      script: |
-        find . -name "Podfile" -execdir pod install \;
-      ignore_failure: true
-    - name: Flutter build ipa and automatic versioning
-      script: |
-        flutter build ipa --release \
-          --build-name=1.0.0 \
-          --build-number=$(($(app-store-connect get-latest-app-store-build-number "$APP_ID") + 1)) \
-          --export-options-plist=/Users/builder/export_options.plist
-  artifacts:
-    - build/ios/ipa/*.ipa
-    - /tmp/xcodebuild_logs/*.log
-    - flutter_drive.log
-  publishing:
-    # See the following link for details about email publishing - https://docs.codemagic.io/publishing-yaml/distribution/#email
-    email:
-      recipients:
-        - Qlixedesign@gmail.com
-      notify:
-        success: true # To receive a notification when a build succeeds
-        failure: false # To not receive a notification when a build fails
-    app_store_connect:
-      auth: integration
+          echo $IOS_FIREBASE_SECRET > $CM_BUILD_DIR/ios/Runner/GoogleService-Info.plist
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+        ignore_failure: true
+      - name: Flutter build ipa and automatic versioning
+        script: |
+          flutter build ipa --release \
+            --build-name=1.0.0 \
+            --build-number=$(($(app-store-connect get-latest-app-store-build-number "$APP_ID") + 1)) \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    publishing:
+      # See the following link for details about email publishing - https://docs.codemagic.io/publishing-yaml/distribution/#email
+      email:
+        recipients:
+          - Qlixedesign@gmail.com
+        notify:
+          success: true # To receive a notification when a build succeeds
+          failure: false # To not receive a notification when a build fails
+      app_store_connect:
+        auth: integration
 
-      # Configuration related to TestFlight (optional)
-      # Note: This action is performed during post-processing.
-      submit_to_testflight: true
-      beta_groups: # Specify the names of beta tester groups that will get access to the build once it has passed beta review.
-        - qlixe
+        # Configuration related to TestFlight (optional)
+        # Note: This action is performed during post-processing.
+        submit_to_testflight: true
+        beta_groups: # Specify the names of beta tester groups that will get access to the build once it has passed beta review.
+          - qlixe
 
-      # Configuration related to App Store (optional)
-      # Note: This action is performed during post-processing.
-      submit_to_app_store: false
-# workflows:
-#   my-workflow:
-#     name: My workflow name
-# labels:
-#   - QA
-#   - ${TENANT_NAME}
-# instance_type: mac_mini_m1
-# max_build_duration: 60
-# environment:
-#   groups:
-#     - firebase_credentials
-#   vars:
-#     PUBLIC_ENV_VAR: "value here"
-#   flutter: stable
-#   xcode: latest
-# cache:
-#   cache_paths:
-#     - ~/.pub-cache
-# triggering:
-#   events:
-#     - push
-#   branch_patterns:
-#     - pattern: '*'
-#       include: true
-#       source: true
-#   cancel_previous_builds: false
-# scripts:
-# - name: Load Firebase configuration
-#   script: |
-#     #!/usr/bin/env sh
-#     set -e # exit on first failed command
+        # Configuration related to App Store (optional)
+        # Note: This action is performed during post-processing.
+        submit_to_app_store: false
+  # workflows:
+  #   my-workflow:
+  #     name: My workflow name
+  # labels:
+  #   - QA
+  #   - ${TENANT_NAME}
+  # instance_type: mac_mini_m1
+  # max_build_duration: 60
+  # environment:
+  #   groups:
+  #     - firebase_credentials
+  #   vars:
+  #     PUBLIC_ENV_VAR: "value here"
+  #   flutter: stable
+  #   xcode: latest
+  # cache:
+  #   cache_paths:
+  #     - ~/.pub-cache
+  # triggering:
+  #   events:
+  #     - push
+  #   branch_patterns:
+  #     - pattern: '*'
+  #       include: true
+  #       source: true
+  #   cancel_previous_builds: false
+  # scripts:
+  # - name: Load Firebase configuration
+  #   script: |
+  #     #!/usr/bin/env sh
+  #     set -e # exit on first failed command
 
-#     echo $IOS_FIREBASE_SECRET > $CM_BUILD_DIR/ios/Runner/GoogleService-Info.plist
+  #     echo $IOS_FIREBASE_SECRET > $CM_BUILD_DIR/ios/Runner/GoogleService-Info.plist
